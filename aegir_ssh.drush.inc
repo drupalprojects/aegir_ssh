@@ -8,6 +8,12 @@ function aegir_ssh_post_hosting_verify_task($task, $data)
 
   // When a server is being verified...
   if ($task->ref->type == 'server') {
+
+    // Check for authorized_keys.
+    if (empty($task->ref->authorized_keys) || count($task->ref->authorized_keys) < 1) {
+      return;
+    }
+
     drush_log('[aegir_ssh] server verify...', 'ok');
 
     // Queue site deletion for each environment.
