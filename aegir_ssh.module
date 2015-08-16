@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Implements hook_nodeapi()
+ *
+ * Loads ALL uploaded ssh keys into the server_master server node.
+ */
+function aegir_ssh_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($op == 'load' && $node->type == 'server') {
+
+    // Only save keys for @hostmaster's own web server.
+    if ($node->nid == variable_get('hosting_own_web_server', NULL)) {
+      $node->authorized_keys = array();
+      $query = db_query('SELECT value FROM {sshkey}');
+      while ($result = db_fetch_object($query)) {
+        $node->authorized_keys[] = $result->value;
+      }
+    }
+  }
+}
