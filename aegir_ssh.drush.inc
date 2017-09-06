@@ -35,7 +35,7 @@ function aegir_ssh_post_hosting_verify_task($task, $data)
     if (is_readable($manual_keys_filename)) {
       $manual_keys = explode("\n", file_get_contents($manual_keys_filename));
       array_unshift($manual_keys, "# BEGIN manual keys import from $manual_keys_filename");
-      $manual_keys[] = "# END manual keys import from ";
+      $manual_keys[] = "# END manual keys import from $manual_keys_filename";
     }
     
     $lines = array_merge(
