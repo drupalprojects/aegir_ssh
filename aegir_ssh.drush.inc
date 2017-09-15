@@ -49,6 +49,12 @@ function aegir_ssh_post_hosting_verify_task($task, $data)
       $manual_keys,
       $notes
     );
+
+    // Create the dir if not already exists.
+    if (!file_exists($ssh_config_dir)) {
+      mkdir($ssh_config_dir, 0700);
+    }
+
     $authorized_keys = implode("\n", $lines);
     if (file_put_contents($ssh_config_dir . 'authorized_keys', $authorized_keys)) {
       drush_log("[aegir_ssh] Wrote ${ssh_config_dir}authorized_keys!", 'ok');
