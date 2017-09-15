@@ -20,6 +20,9 @@ function aegir_ssh_post_hosting_verify_task($task, $data)
     $count = count($task->ref->authorized_keys);
     drush_log('[aegir_ssh] ' . $count . ' ssh keys found', 'ok');
 
+    // Lookup ssh config dir, generally /var/aegir/.ssh/
+    $ssh_config_dir = d($task->ref->title)->aegir_root . '/.ssh/';
+
     // Write to "authorized_keys".
     $notes[] = " ";
     $notes[] = "# NOTE: Do NOT manually edit this file. It is overwritten every time the server_master is verified.";
@@ -30,7 +33,7 @@ function aegir_ssh_post_hosting_verify_task($task, $data)
     $pre_keys[] = '# BEGIN keys stored in Hostmaster';
     $post_keys[] = '# END keys stored in Hostmaster';
     
-    $manual_keys_filename = '/var/aegir/.ssh/authorized_keys_manual';
+    $manual_keys_filename = $ssh_config_dir . 'authorized_keys_manual';
     $manual_keys = [];
     if (is_readable($manual_keys_filename)) {
       $manual_keys = explode("\n", file_get_contents($manual_keys_filename));
@@ -47,14 +50,14 @@ function aegir_ssh_post_hosting_verify_task($task, $data)
       $notes
     );
     $authorized_keys = implode("\n", $lines);
-    if (file_put_contents('/var/aegir/.ssh/authorized_keys', $authorized_keys)) {
-      drush_log('[aegir_ssh] Wrote /var/aegir/.ssh/authorized_keys!', 'ok');
-      chmod('/var/aegir/.ssh/authorized_keys', 0600);
-      drush_log('[aegir_ssh] Changed Permissions of /var/aegir/.ssh/authorized_keys to 600', 'ok');
+    if (file_put_contents($ssh_config_dir . 'authorized_keys', $authorized_keys)) {
+      drush_log("[aegir_ssh] Wrote ${ssh_config_dir}authorized_keys!", 'ok');
+      chmod($ssh_config_dir . 'authorized_keys', 0600);
+      drush_log("[aegir_ssh] Changed Permissions of ${ssh_config_dir}authorized_keys to 600", 'ok');
 
     }
     else {
-      return drush_set_error('AEGIR_ERROR', '[aegir_ssh] COULD NOT write ~/.ssh/authorized_keys!');
+      return drush_set_error('AEGIR_ERROR', "[aegir_ssh] COULD NOT write ${ssh_config_dir}/authorized_keys!");
     }
   }
 }
